@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه ارزشیابی عملکرد نیروهای آموزش و پرورش ناحیه ۶ اصفهان (نسخه کامل و مستقل)</title>
+  <meta name="description" content="سامانه جامع، حرفه‌ای و عملیاتی ثبت، ارزشیابی، تحلیل و گزارش‌گیری عملکرد نیروها و مدارس آموزش و پرورش ناحیه ۶ اصفهان با اعمال ضرایب ۱ تا ۳ طرح‌ها">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
+    table { border-collapse: collapse; width: 100%; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; color: #000 !important; font-size: 11pt !important; }
+      .shadow-xs, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl { box-shadow: none !important; }
+      @page { margin: 1.2cm; size: A4 portrait; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-teal-700 via-sky-800 to-blue-950 text-white rounded-2xl flex items-center justify-center shadow-md font-black text-xl border border-teal-400/40">
+            🕌
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span id="hdrOffice" class="text-[10px] sm:text-xs text-teal-800 font-bold leading-none bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
+                اداره آموزش و پرورش ناحیه ۶ اصفهان
+              </span>
+              <span class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md font-bold hidden sm:inline-block">
+                اصفهان؛ نصف جهان
+              </span>
+            </div>
+            <h1 class="text-sm sm:text-base font-black text-slate-900 leading-tight">
+              سامانه ارزشیابی عملکرد نیروهای آموزش و پرورش ناحیه ۶ اصفهان
+            </h1>
+            <div class="flex items-center gap-2 mt-1">
+              <div id="hdrDept" class="text-[10px] text-teal-700 font-medium hidden sm:block">
+                کارشناسی امور پرورشی و فرهنگی | سال تحصیلی ۱۴۰۳-۱۴۰۴
+              </div>
+              <span class="text-[10px] font-bold bg-teal-50 text-teal-800 px-2 py-0.5 rounded-md border border-teal-200">
+                طراح سامانه: علیرضا شریعتی
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-200">
+          <form onsubmit="handleNavQuickJump(event)" class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-slate-600 hidden sm:inline pr-1">ورود به کارتابل:</span>
+            <input
+              type="text"
+              id="navQuickCodeInput"
+              maxlength="4"
+              placeholder="کد ۲ رقمی"
+              class="w-20 text-center font-mono font-bold text-xs p-1.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+            >
+            <button
+              type="submit"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
+            >
+              برو
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-slate-900 text-white border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-1 overflow-x-auto py-1 scrollbar-none text-xs">
+          <button onclick="switchTab('dashboard')" id="tabBtn-dashboard" class="tab-btn px-3 py-2 rounded-xl font-bold bg-emerald-500 text-white">داشبورد</button>
+          <button onclick="switchTab('cartable')" id="tabBtn-cartable" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">کارتابل همکار</button>
+          <button onclick="switchTab('employees')" id="tabBtn-employees" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">همکاران</button>
+          <button onclick="switchTab('programs')" id="tabBtn-programs" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">برنامه‌ها و ضرایب</button>
+          <button onclick="openAssignModal()" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">➕ اختصاص برنامه</button>
+          <button onclick="switchTab('excel_import')" id="tabBtn-excel_import" class="tab-btn px-3 py-2 rounded-xl font-bold text-teal-300 hover:text-white hover:bg-slate-800">📥 ورود گروهی از Excel</button>
+          <button onclick="switchTab('ranking')" id="tabBtn-ranking" class="tab-btn px-3 py-2 rounded-xl font-bold text-amber-300 hover:text-white hover:bg-slate-800">🏆 رتبه‌بندی با ضرایب</button>
+          <button onclick="switchTab('performance_report')" id="tabBtn-performance_report" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">گزارش همکاران</button>
+          <button onclick="switchTab('schools_report')" id="tabBtn-schools_report" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">گزارش مدارس</button>
+          <button onclick="switchTab('programs_report')" id="tabBtn-programs_report" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">گزارش طرح‌ها</button>
+          <button onclick="downloadHtmlReportFromApp()" class="tab-btn px-3 py-2 rounded-xl font-bold text-emerald-300 hover:bg-slate-800">📄 خروجی HTML</button>
+          <button onclick="exportToExcel()" class="tab-btn px-3 py-2 rounded-xl font-bold text-emerald-300 hover:bg-slate-800">📊 خروجی Excel</button>
+          <button onclick="switchTab('backup_settings')" id="tabBtn-backup_settings" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">پشتیبان و تنظیمات</button>
+          <button onclick="switchTab('guide')" id="tabBtn-guide" class="tab-btn px-3 py-2 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-slate-800">راهنما</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- TAB 1: DASHBOARD -->
+    <section id="view-dashboard" class="tab-view space-y-8">
+      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold mb-4">
+            <span>✨ اداره آموزش و پرورش ناحیه ۶ اصفهان | سال تحصیلی ۱۴۰۳-۱۴۰۴</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-black mb-3">سامانه ارزشیابی عملکرد نیروهای آموزش و پرورش ناحیه ۶ اصفهان</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+            محاسبه هوشمند امتیازات نهایی همکاران و مدارس با اعمال ضرایب ۱ تا ۳ برای طرح‌های مهم و محوری
+          </p>
+
+          <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 shadow-lg max-w-xl">
+            <h3 class="text-sm sm:text-base font-bold text-emerald-300 mb-2">ورود سریع به کارتابل همکار با کد دو رقمی:</h3>
+            <form onsubmit="handleHeroQuickJump(event)" class="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                id="heroQuickCodeInput"
+                maxlength="4"
+                placeholder="کد دو رقمی همکار (مثلاً 27 یا 01)"
+                class="flex-1 text-center font-mono font-bold text-lg p-3 bg-white text-slate-900 rounded-xl outline-none shadow-inner"
+              >
+              <button
+                type="submit"
+                class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-all cursor-pointer"
+              >
+                ورود به کارتابل ↵
+              </button>
+            </form>
+            <div id="heroErrorMsg" class="hidden mt-2 p-2 bg-rose-500/20 text-rose-200 rounded-lg text-xs font-bold"></div>
+            <div id="quickChipsContainer" class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-1.5 text-xs text-slate-300">
+              <span class="text-[11px] text-slate-400">دسترسی سریع:</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 KPI Cards -->
+      <div>
+        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <span>📈 شاخص‌های کلی عملکرد منطقه</span>
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="kpiGrid"></div>
+      </div>
+
+      <!-- Charts & Top Colleagues -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col items-center justify-between">
+          <div class="w-full mb-3">
+            <h4 class="font-bold text-slate-800 text-sm">نمودار وضعیت کلی اجرای طرح‌ها</h4>
+            <p class="text-[11px] text-slate-400">تفکیک کل تکالیف ثبت شده در منطقه</p>
+          </div>
+          <div id="overallDonutChart" class="my-4"></div>
+          <div class="w-full text-center text-xs text-slate-500 pt-3 border-t border-slate-100">
+            بروزرسانی زنده بر اساس تمام تکالیف
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <span>🏆 همکاران برتر بر اساس امتیاز وزنی با ضرایب ۱ تا ۳</span>
+              </h4>
+              <button onclick="switchTab('ranking')" class="text-xs text-emerald-700 font-bold hover:underline">
+                مشاهده تابلوی رتبه‌بندی ←
+              </button>
+            </div>
+            <div id="topRankedList" class="divide-y divide-slate-100"></div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <button onclick="openEmployeeModal()" class="p-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold">➕ ثبت همکار جدید</button>
+            <button onclick="openProgramModal()" class="p-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold">➕ تعریف طرح جدید</button>
+            <button onclick="openAssignModal()" class="p-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold">📤 تخصیص گروهی</button>
+            <button onclick="exportToExcel()" class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold">📥 دانلود اکسل</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: CARTABLE -->
+    <section id="view-cartable" class="tab-view hidden space-y-6">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+        <div class="flex items-center gap-2">
+          <button onclick="navigateCartablePrev()" class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold hover:bg-slate-100">
+            همکار قبلی →
+          </button>
+          <button onclick="navigateCartableNext()" class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold hover:bg-slate-100">
+            ← همکار بعدی
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openBatchStatusModal()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs">
+            ⚡ ثبت سریع وضعیت‌ها (یکجا)
+          </button>
+          <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">
+            🖨️ چاپ کارنامه
+          </button>
+        </div>
+      </div>
+
+      <div id="cartableProfileCard" class="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white p-6 sm:p-8 rounded-3xl shadow-xl"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4" id="cartableKpiGrid"></div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col items-center justify-center">
+          <h4 class="text-xs font-bold text-slate-800 mb-2">نمودار عملکرد این همکار</h4>
+          <div id="cartableDonutChart"></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm">لیست برنامه‌ها و طرح‌های اختصاص‌یافته با ضریب امتیازی</h3>
+            <p class="text-xs text-slate-500">برای تغییر وضعیت سریع، روی دکمه‌های وضعیت کلیک نمایید</p>
+          </div>
+          <button onclick="openAssignModal(currentCartableEmpId)" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl">
+            ➕ اختصاص طرح جدید به این همکار
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-3 w-12 text-center">#</th>
+                <th class="p-3">عنوان طرح / برنامه</th>
+                <th class="p-3 text-center">ضریب طرح</th>
+                <th class="p-3">محور</th>
+                <th class="p-3 text-center">مهلت مقرر</th>
+                <th class="p-3 text-center">تاریخ اجرا</th>
+                <th class="p-3 text-center">محل ارسال</th>
+                <th class="p-3 text-center">وضعیت</th>
+                <th class="p-3 text-center">امتیاز کسب‌شده</th>
+                <th class="p-3">توضیحات و مستندات</th>
+                <th class="p-3 text-center no-print">تغییر وضعیت</th>
+              </tr>
+            </thead>
+            <tbody id="cartableProgramsTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: EMPLOYEES MANAGEMENT -->
+    <section id="view-employees" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">مدیریت اطلاعات همکاران پرورشی</h2>
+          <p class="text-xs text-slate-500">ثبت، ویرایش و تخصیص کد اختصاصی دو رقمی به نیروها</p>
+        </div>
+        <button onclick="openEmployeeModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs">
+          ➕ ثبت همکار جدید با کد اختصاصی
+        </button>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2 flex-1">
+          <input
+            type="text"
+            id="searchEmployeesInput"
+            oninput="renderEmployeesList()"
+            placeholder="جستجو با کد ۲ رقمی، نام یا مدرسه..."
+            class="flex-1 max-w-xs p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-none focus:bg-white"
+          >
+          <select id="filterEmployeesRole" onchange="renderEmployeesList()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium">
+            <option value="all">همه سمت‌های سازمانی</option>
+            <option value="مدیر">مدیر</option>
+            <option value="معاون آموزشی">معاون آموزشی</option>
+            <option value="معاون پرورشی">معاون پرورشی</option>
+            <option value="دبیر">دبیر</option>
+            <option value="آموزگار">آموزگار</option>
+            <option value="معاون اجرایی">معاون اجرایی</option>
+            <option value="سایر">سایر</option>
+          </select>
+        </div>
+        <span id="employeesCountBadge" class="text-xs text-slate-500 font-bold"></span>
+      </div>
+
+      <div id="employeesCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- TAB: EXCEL BULK IMPORT -->
+    <section id="view-excel_import" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <span>📥 ورود گروهی اطلاعات عملکرد از فایل Excel</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            ثبت سریع وضعیت اجرای طرح‌ها برای همکاران از طریق فایل اکسل بدون نیاز به ثبت دستی تک‌به‌تک
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadSampleExcelTemplate()" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition-colors">
+            📥 دانلود فایل الگوی نمونه اکسل
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <label class="block font-bold text-xs text-slate-800">۱. سناریو و روش ورود اطلاعات:</label>
+            <select id="excelImportMode" onchange="handleExcelModeChange()" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium">
+              <option value="completed_only">فهرست انجام‌دهندگان (فقط حاضرین «انجام شده» شوند)</option>
+              <option value="full_status">ستون وضعیت در فایل (انجام شده / تاخیر / انجام نشده)</option>
+            </select>
+          </div>
+
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <label class="block font-bold text-xs text-slate-800">۲. انتخاب طرح / برنامه هدف:</label>
+            <select id="excelImportTargetProgram" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium"></select>
+          </div>
+
+          <div class="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-2 flex flex-col justify-between">
+            <div>
+              <label class="block font-bold text-xs text-emerald-950">۳. بارگذاری فایل اکسل (.xlsx, .xls):</label>
+              <input type="file" id="excelImportFileInput" accept=".xlsx, .xls, .csv" onchange="handleExcelFileUpload(event)" class="mt-2 text-xs w-full">
+            </div>
+            <div id="excelFileStatus" class="text-[11px] font-bold text-slate-500">
+              هیچ فایلی انتخاب نشده است
+            </div>
+          </div>
+        </div>
+
+        <div id="excelPreviewSection" class="hidden space-y-4 pt-4 border-t border-slate-200">
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="flex items-center gap-3 text-xs font-bold text-slate-700">
+              <span>📊 ردیف‌های خوانده‌شده: <strong id="excelStatTotal" class="font-mono text-slate-900">۰</strong></span>
+              <span>🟢 تطبیق موفق: <strong id="excelStatMatched" class="font-mono text-emerald-700">۰</strong></span>
+              <span>🔴 بدون تطبیق: <strong id="excelStatUnmatched" class="font-mono text-rose-700">۰</strong></span>
+            </div>
+            <button onclick="applyExcelImportData()" id="btnApplyExcelImport" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer">
+              ✓ تایید و اعمال قطعی اطلاعات در سامانه
+            </button>
+          </div>
+
+          <div class="max-h-80 overflow-y-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                <tr>
+                  <th class="p-2.5 w-12 text-center">ردیف</th>
+                  <th class="p-2.5">نام و نام خانوادگی</th>
+                  <th class="p-2.5 text-center">کد / پرسنلی</th>
+                  <th class="p-2.5">سمت</th>
+                  <th class="p-2.5">آموزشگاه</th>
+                  <th class="p-2.5">طرح هدف</th>
+                  <th class="p-2.5 text-center">وضعیت جدید</th>
+                  <th class="p-2.5 text-center">نتیجه تطبیق</th>
+                </tr>
+              </thead>
+              <tbody id="excelPreviewTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PROGRAMS MANAGEMENT -->
+    <section id="view-programs" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">تعریف و مدیریت طرح‌های پرورشی با ضرایب ۱ تا ۳</h2>
+          <p class="text-xs text-slate-500">تعریف اهداف، ضریب وزنی طرح (از ۱ تا ۳) و مهلت نهایی اجرا</p>
+        </div>
+        <button onclick="openProgramModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs">
+          ➕ تعریف برنامه / طرح جدید
+        </button>
+      </div>
+
+      <div id="programsCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- TAB: COLLEAGUE RANKINGS -->
+    <section id="view-ranking" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <span>🏆 تابلوی افتخار و رتبه‌بندی عملکرد همکاران پرورشی (با ضرایب ۱ تا ۳)</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            محاسبه امتیاز نهایی با ضرب ضریب طرح: به‌موقع (۱۰۰ × ضریب) و با تأخیر (۶۰ × ضریب)
+          </p>
+        </div>
+        <div class="flex items-center gap-2 no-print">
+          <button onclick="window.print()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer">🖨️ چاپ تابلوی رتبه‌بندی</button>
+          <button onclick="downloadHtmlReportFromApp()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer">📄 خروجی گزارش HTML</button>
+          <button onclick="exportRankingToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">📊 اکسل رتبه‌بندی</button>
+        </div>
+      </div>
+
+      <div id="rankingPodiumContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+        <div class="flex flex-wrap items-center gap-2 flex-1">
+          <input
+            type="text"
+            id="searchRankingInput"
+            oninput="renderColleagueRanking()"
+            placeholder="جستجو با کد ۲ رقمی، نام یا مدرسه..."
+            class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-none w-64 focus:bg-white"
+          >
+          <select id="filterRankingGrade" onchange="renderColleagueRanking()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+            <option value="all">همه مقاطع تحصیلی</option>
+            <option value="ابتدایی دوره اول">ابتدایی دوره اول</option>
+            <option value="ابتدایی دوره دوم">ابتدایی دوره دوم</option>
+            <option value="متوسطه اول">متوسطه اول</option>
+            <option value="متوسطه دوم نظری">متوسطه دوم نظری</option>
+            <option value="هنرستان فنی و حرفه‌ای و کاردانش">هنرستان</option>
+          </select>
+          <select id="filterRankingRole" onchange="renderColleagueRanking()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium">
+            <option value="all">همه سمت‌های سازمانی</option>
+            <option value="مدیر">مدیر</option>
+            <option value="معاون آموزشی">معاون آموزشی</option>
+            <option value="معاون پرورشی">معاون پرورشی</option>
+            <option value="دبیر">دبیر</option>
+            <option value="آموزگار">آموزگار</option>
+            <option value="معاون اجرایی">معاون اجرایی</option>
+            <option value="سایر">سایر</option>
+          </select>
+          <select id="filterRankingSort" onchange="renderColleagueRanking()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700">
+            <option value="score">مرتب‌سازی: بیشترین امتیاز با ضریب</option>
+            <option value="done">مرتب‌سازی: بیشترین اجرای به‌موقع</option>
+            <option value="progress">مرتب‌سازی: درصد پیشرفت</option>
+          </select>
+        </div>
+        <span id="rankingCountBadge" class="text-xs text-slate-500 font-bold"></span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 w-16 text-center">رتبه</th>
+              <th class="p-3 w-20 text-center">کد ۲ رقمی</th>
+              <th class="p-3">نام و نام خانوادگی</th>
+              <th class="p-3">آموزشگاه محل خدمت</th>
+              <th class="p-3">سمت</th>
+              <th class="p-3 text-center">کل برنامه‌ها</th>
+              <th class="p-3 text-center text-amber-800">مجموع ضرایب</th>
+              <th class="p-3 text-center text-emerald-800">🟢 به‌موقع</th>
+              <th class="p-3 text-center text-amber-800">🟠 با تأخیر</th>
+              <th class="p-3 text-center text-rose-800">🔴 انجام نشده</th>
+              <th class="p-3 text-center bg-emerald-50/50">درصد پیشرفت</th>
+              <th class="p-3 text-center bg-amber-50/50">امتیاز نهایی با ضریب</th>
+              <th class="p-3 text-center">سطح ارزیابی</th>
+              <th class="p-3 text-center no-print">عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="rankingTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 5: PERFORMANCE REPORT (ALL STAFF) -->
+    <section id="view-performance_report" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">گزارش جامع ارزیابی عملکرد تمام همکاران</h2>
+          <p class="text-xs text-slate-500">جدول مقایسه‌ای وضعیت اجراها، درصد پیشرفت و امتیاز با ضریب</p>
+        </div>
+        <div class="flex items-center gap-2 no-print">
+          <button onclick="window.print()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">🖨️ چاپ</button>
+          <button onclick="exportToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">📊 دریافت اکسل</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 w-12 text-center">ردیف</th>
+              <th class="p-3 w-20 text-center">کد همکار</th>
+              <th class="p-3">نام و نام خانوادگی</th>
+              <th class="p-3">آموزشگاه</th>
+              <th class="p-3">سمت و مقطع</th>
+              <th class="p-3 text-center">کل برنامه‌ها</th>
+              <th class="p-3 text-center text-emerald-800">🟢 انجام شده</th>
+              <th class="p-3 text-center text-amber-800">🟠 دیر انجام شده</th>
+              <th class="p-3 text-center text-rose-800">🔴 انجام نشده</th>
+              <th class="p-3 text-center bg-emerald-50/50">درصد پیشرفت</th>
+              <th class="p-3 text-center bg-amber-50/50">امتیاز نهایی با ضریب</th>
+              <th class="p-3 text-center no-print">عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="performanceReportTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 6: SCHOOLS REPORT -->
+    <section id="view-schools_report" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">گزارش تجمیعی عملکرد آموزشگاه‌ها و مدارس (با ضرایب طرح‌ها)</h2>
+          <p class="text-xs text-slate-500">ارزیابی فعالیت‌های پرورشی مدارس با محاسبه امتیاز وزنی مکتسبه</p>
+        </div>
+        <div class="flex items-center gap-2 no-print">
+          <button onclick="openSchoolModal()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer">
+            ➕ ثبت آموزشگاه جدید
+          </button>
+          <button onclick="window.print()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">🖨️ چاپ</button>
+          <button onclick="exportToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">📊 دریافت اکسل</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 w-12 text-center">ردیف</th>
+              <th class="p-3">نام آموزشگاه</th>
+              <th class="p-3 text-center">کد مدرسه</th>
+              <th class="p-3">مقطع و جنسیت</th>
+              <th class="p-3 text-center">تعداد نیروها</th>
+              <th class="p-3 text-center">کل برنامه‌ها</th>
+              <th class="p-3 text-center text-emerald-800">🟢 انجام شده</th>
+              <th class="p-3 text-center text-amber-800">🟠 دیر انجام شده</th>
+              <th class="p-3 text-center text-rose-800">🔴 انجام نشده</th>
+              <th class="p-3 text-center bg-emerald-50/50">درصد پیشرفت</th>
+              <th class="p-3 text-center bg-amber-50/50">امتیاز وزنی مدرسه</th>
+              <th class="p-3 text-center no-print">عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="schoolsReportTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: PROGRAMS PERFORMANCE REPORT -->
+    <section id="view-programs_report" class="tab-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">گزارش تحلیلی اجرای طرح‌ها و برنامه‌های پرورشی</h2>
+          <p class="text-xs text-slate-500">بررسی میزان تحقق هر طرح در سطح منطقه و ضریب امتیازی آن</p>
+        </div>
+        <div class="flex items-center gap-2 no-print">
+          <button onclick="openProgramModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs">
+            ➕ تعریف طرح جدید
+          </button>
+          <button onclick="window.print()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">🖨️ چاپ</button>
+          <button onclick="exportToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">📊 دریافت اکسل</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-3 w-12 text-center">ردیف</th>
+              <th class="p-3 w-20 text-center">کد طرح</th>
+              <th class="p-3">عنوان برنامه</th>
+              <th class="p-3 text-center bg-amber-50">ضریب طرح (۱ تا ۳)</th>
+              <th class="p-3">محور و دامنه</th>
+              <th class="p-3 text-center">مهلت نهایی</th>
+              <th class="p-3 text-center">تعداد مشمولین</th>
+              <th class="p-3 text-center text-emerald-800">🟢 انجام شده</th>
+              <th class="p-3 text-center text-amber-800">🟠 با تأخیر</th>
+              <th class="p-3 text-center text-rose-800">🔴 عدم اجرا</th>
+              <th class="p-3 text-center bg-emerald-50/50">درصد تحقق</th>
+              <th class="p-3 text-center no-print">عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="programsReportTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 7: BACKUP & SETTINGS -->
+    <section id="view-backup_settings" class="tab-view hidden space-y-6 max-w-4xl mx-auto">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+        <h2 class="text-lg font-bold text-slate-800">🛡️ پشتیبان‌گیری و بازیابی اطلاعات</h2>
+        <p class="text-xs text-slate-500">اطلاعات شما در مرورگر ذخیره است. جهت امنیت، حتماً نسخه پشتیبان دانلود نمایید.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800 mb-1">دانلود نسخه پشتیبان (JSON)</h3>
+              <p class="text-xs text-slate-600 mb-3">یک فایل کامل از تمام اطلاعات همکاران، طرح‌ها و ضرایب ذخیره می‌شود.</p>
+            </div>
+            <button onclick="downloadBackupJson()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">
+              📥 دانلود فایل پشتیبان سیستم
+            </button>
+          </div>
+
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800 mb-1">بازیابی اطلاعات (Restore)</h3>
+              <p class="text-xs text-slate-600 mb-3">فایل پشتیبان JSON قبلی را انتخاب کرده و مجدداً بارگذاری کنید.</p>
+            </div>
+            <input type="file" id="restoreFileInput" accept=".json" onchange="handleRestoreJson(event)" class="text-xs">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+          <button onclick="resetToSampleData()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold cursor-pointer">
+            🔄 بارگذاری داده‌های نمونه اولیه
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 8: USER GUIDE -->
+    <section id="view-guide" class="tab-view hidden space-y-6 max-w-4xl mx-auto">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h2 class="text-lg font-bold text-slate-800 mb-1">📖 راهنمای کاربری سامانه ارزیابی عملکرد پرورشی</h2>
+        <p class="text-xs text-slate-500 mb-4">نکات مهم درباره نظام ضرایب ۱ تا ۳ برای طرح‌های مهم</p>
+        <div class="space-y-3 text-xs text-slate-700 leading-relaxed">
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+            <strong>ضریب امتیازی طرح‌ها:</strong> هر طرح دارای ضریب ۱ (عادی)، ۲ (مهم) یا ۳ (ویژه) است. انجام به‌موقع هر طرح ۱۰۰ × ضریب امتیاز دارد و انجام با تاخیر ۶۰ × ضریب امتیاز دارد. این ضریب مستقیماً در امتیاز رتبه‌بندی همکاران و رتبه‌بندی مدارس محاسبه می‌شود.
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <strong>ورود با کد دو رقمی:</strong> کافیست کد ۲ رقمی هر فرد (مانند ۰۱ تا ۹۹) را در کادر بالای سامانه وارد کنید تا مستقیماً کارتابل او باز شود.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 mt-8 py-5 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <span class="font-bold text-slate-800">اداره آموزش و پرورش ناحیه ۶ اصفهان</span>
+        <span class="text-slate-400">|</span>
+        <span>کارشناسی امور پرورشی، فرهنگی، قرآن و عترت</span>
+      </div>
+      <div class="font-bold text-slate-700 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1.5">
+        <span>💻 طراح و توسعه‌دهنده:</span>
+        <span class="text-emerald-700 font-black">علیرضا شریعتی</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+  <div id="employeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+        <h3 id="employeeModalTitle" class="font-bold text-base text-slate-800">ثبت همکار جدید</h3>
+        <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <form onsubmit="handleSaveEmployee(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="empFormId">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">کد اختصاصی دو رقمی *</label>
+            <input type="text" id="empFormCode" maxlength="4" required class="w-full text-center font-mono font-bold text-base p-2 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">کد پرسنلی</label>
+            <input type="text" id="empFormPersonnel" dir="ltr" class="w-full text-center font-mono text-xs p-2 border border-slate-300 rounded-xl">
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">نام و نام خانوادگی همکار *</label>
+          <input type="text" id="empFormName" required class="w-full p-2 border border-slate-300 rounded-xl">
+        </div>
+        <div>
+          <label class="font-bold block mb-1">آموزشگاه محل خدمت *</label>
+          <select id="empFormSchoolSelect" class="w-full p-2 border border-slate-300 rounded-xl font-medium"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">مقطع تحصیلی</label>
+            <select id="empFormGrade" class="w-full p-2 border border-slate-300 rounded-xl">
+              <option value="ابتدایی دوره اول">ابتدایی دوره اول</option>
+              <option value="ابتدایی دوره دوم">ابتدایی دوره دوم</option>
+              <option value="متوسطه اول">متوسطه اول</option>
+              <option value="متوسطه دوم نظری">متوسطه دوم نظری</option>
+              <option value="هنرستان فنی و حرفه‌ای و کاردانش">هنرستان</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">سمت سازمانی *</label>
+            <select id="empFormRole" class="w-full p-2 border border-slate-300 rounded-xl font-bold text-slate-800">
+              <option value="مدیر">۱. مدیر</option>
+              <option value="معاون آموزشی">۲. معاون آموزشی</option>
+              <option value="معاون پرورشی">۳. معاون پرورشی</option>
+              <option value="دبیر">۴. دبیر</option>
+              <option value="آموزگار">۵. آموزگار</option>
+              <option value="معاون اجرایی">۶. معاون اجرایی</option>
+              <option value="سایر">۷. سایر</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">شماره تماس (اختیاری)</label>
+          <input type="text" id="empFormPhone" dir="ltr" class="w-full text-right p-2 border border-slate-300 rounded-xl">
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeEmployeeModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold cursor-pointer">انصراف</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-bold cursor-pointer">ذخیره همکار</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="schoolModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+        <h3 id="schoolModalTitle" class="font-bold text-base text-slate-800">ثبت آموزشگاه جدید</h3>
+        <button onclick="closeSchoolModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <form onsubmit="handleSaveSchool(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="schFormId">
+        <div>
+          <label class="block font-bold mb-1">نام آموزشگاه *</label>
+          <input type="text" id="schFormName" required class="w-full p-2 border border-slate-300 rounded-xl">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">کد مدرسه</label>
+            <input type="text" id="schFormCode" required class="w-full text-center font-mono p-2 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">جنسیت</label>
+            <select id="schFormGender" class="w-full p-2 border border-slate-300 rounded-xl">
+              <option value="پسرانه">پسرانه</option>
+              <option value="دخترانه">دخترانه</option>
+              <option value="مختلط">مختلط</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">مقطع تحصیلی</label>
+          <select id="schFormGrade" class="w-full p-2 border border-slate-300 rounded-xl">
+            <option value="ابتدایی دوره اول">ابتدایی دوره اول</option>
+            <option value="ابتدایی دوره دوم">ابتدایی دوره دوم</option>
+            <option value="متوسطه اول">متوسطه اول</option>
+            <option value="متوسطه دوم نظری">متوسطه دوم نظری</option>
+            <option value="هنرستان فنی و حرفه‌ای و کاردانش">هنرستان فنی و حرفه‌ای و کاردانش</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSchoolModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold cursor-pointer">انصراف</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-bold cursor-pointer">ذخیره آموزشگاه</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="programModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+        <h3 id="programModalTitle" class="font-bold text-base text-slate-800">تعریف برنامه جدید</h3>
+        <button onclick="closeProgramModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <form onsubmit="handleSaveProgram(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="prgFormId">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">کد طرح</label>
+            <input type="text" id="prgFormCode" required class="w-full font-mono text-center p-2 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">محور پرورشی</label>
+            <select id="prgFormAxis" class="w-full p-2 border border-slate-300 rounded-xl">
+              <option value="قرآن، عترت و نماز">قرآن، عترت و نماز</option>
+              <option value="فرهنگی و هنری">فرهنگی و هنری</option>
+              <option value="مشاوره و مراقبت در برابر آسیب‌های اجتماعی">مشاوره و مراقبت</option>
+              <option value="اردویی، کانون‌ها و اوقات فراغت">اردویی و کانون‌ها</option>
+              <option value="مناسبت‌های ملی و مذهبی">مناسبت‌های ملی و مذهبی</option>
+              <option value="تشکل‌های دانش‌آموزی و گفتمان‌ها">تشکل‌ها و گفتمان‌ها</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">عنوان برنامه / طرح *</label>
+          <input type="text" id="prgFormTitle" required class="w-full p-2 border border-slate-300 rounded-xl">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">دامنه طرح</label>
+            <select id="prgFormScope" class="w-full p-2 border border-slate-300 rounded-xl font-medium">
+              <option value="همگانی">همگانی (مؤثر در امتیاز)</option>
+              <option value="اختصاصی">اختصاصی (بدون امتیاز)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1 text-amber-900">ضریب وزنی طرح (۱ تا ۳) *</label>
+            <select id="prgFormCoeff" class="w-full p-2 border border-amber-300 bg-amber-50 rounded-xl font-bold text-amber-950">
+              <option value="1">ضریب ۱ (عادی - ۱۰۰ امتیاز)</option>
+              <option value="2">ضریب ۲ (بااهمیت - ۲۰۰ امتیاز)</option>
+              <option value="3">ضریب ۳ (ویژه - ۳۰۰ امتیاز)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold mb-1">تاریخ شروع</label>
+            <input type="text" id="prgFormStart" dir="ltr" value="1403/07/01" class="w-full text-center font-mono p-2 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">مهلت نهایی</label>
+            <input type="text" id="prgFormDeadline" dir="ltr" value="1403/09/30" class="w-full text-center font-mono p-2 border border-slate-300 rounded-xl">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeProgramModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold cursor-pointer">انصراف</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-xl font-bold cursor-pointer">ذخیره طرح</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="assignModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 border border-slate-200 flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+        <h3 class="font-bold text-base text-slate-800">تخصیص گروهی طرح به همکاران پرورشی</h3>
+        <button onclick="closeAssignModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs flex-1 overflow-y-auto pr-1">
+        <div>
+          <label class="block font-bold mb-1">انتخاب طرح / برنامه:</label>
+          <select id="assignSelectProgram" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold"></select>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <span class="font-bold text-slate-700">انتخاب همکاران مشمول:</span>
+          <div class="flex gap-2">
+            <button type="button" onclick="selectAllAssignEmployees(true)" class="text-blue-600 underline cursor-pointer">انتخاب همه</button>
+            <button type="button" onclick="selectAllAssignEmployees(false)" class="text-slate-500 underline cursor-pointer">عدم انتخاب</button>
+          </div>
+        </div>
+        <div id="assignEmployeesCheckboxes" class="border border-slate-200 rounded-xl p-3 max-h-56 overflow-y-auto space-y-2 bg-slate-50"></div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t border-slate-200 mt-3">
+        <button type="button" onclick="closeAssignModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold text-xs cursor-pointer">انصراف</button>
+        <button type="button" onclick="handleConfirmAssignment()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs cursor-pointer">
+          ثبت تخصیص تکالیف
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusEditorModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+        <h3 class="font-bold text-base text-slate-800">ویرایش وضعیت اجرای برنامه</h3>
+        <button onclick="closeStatusEditorModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <form onsubmit="handleSaveSingleStatus(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="editAssignmentId">
+        <div id="editStatusProgramInfo" class="p-3 bg-slate-50 rounded-xl text-slate-700"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold mb-1">تاریخ اجرا:</label>
+            <input type="text" id="editStatusActualDate" dir="ltr" class="w-full text-center font-mono p-2 border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">محل ارسال:</label>
+            <select id="editStatusPlatform" class="w-full p-2 font-bold border border-slate-300 rounded-xl">
+              <option value="ایتا">ایتا</option>
+              <option value="شاد">شاد</option>
+              <option value="اتوماسیون">اتوماسیون</option>
+              <option value="سایر">سایر</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">وضعیت اجرا:</label>
+          <select id="editStatusSelect" class="w-full p-2.5 font-bold border border-slate-300 rounded-xl">
+            <option value="done">🟢 انجام شده</option>
+            <option value="late">🟠 دیر انجام شده</option>
+            <option value="not_done">🔴 انجام نشده</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold mb-1">توضیحات و مستندات:</label>
+          <textarea id="editStatusNotes" rows="2" class="w-full p-2 border border-slate-300 rounded-xl"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeStatusEditorModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold cursor-pointer">انصراف</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-bold cursor-pointer">ذخیره وضعیت</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* __STANDALONE_DATABASE_START__ */
+    const DEFAULT_DATABASE = {
+      settings: {
+        officeTitle: 'اداره آموزش و پرورش ناحیه ۶ اصفهان',
+        departmentTitle: 'کارشناسی امور پرورشی و فرهنگی',
+        officerName: 'کارشناس مسئول امور پرورشی',
+        academicYear: 'سال تحصیلی ۱۴۰۳-۱۴۰۴',
+        developerName: 'علیرضا شریعتی'
+      },
+      schools: [
+        { id: 'sch_1', name: 'دبیرستان شهید مطهری', code: '101', grade: 'متوسطه اول', gender: 'پسرانه' },
+        { id: 'sch_2', name: 'دبیرستان فرزانگان ۲', code: '102', grade: 'متوسطه دوم نظری', gender: 'دخترانه' },
+        { id: 'sch_3', name: 'هنرستان شهدای هسته‌ای', code: '103', grade: 'هنرستان فنی و حرفه‌ای و کاردانش', gender: 'پسرانه' },
+        { id: 'sch_4', name: 'دبستان شهدای مکه', code: '104', grade: 'ابتدایی دوره دوم', gender: 'مختلط' }
+      ],
+      programs: [
+        { id: 'prg_1', code: 'PRG-01', title: 'مسابقات قرآن، عترت و نماز (مرحله آموزشگاهی)', axis: 'قرآن، عترت و نماز', scope: 'همگانی', coefficient: 3, startDate: '1403/07/15', deadline: '1403/09/15', isActive: true },
+        { id: 'prg_2', code: 'PRG-02', title: 'انتخابات شورای دانش‌آموزی و تشکیل انجمن‌ها', axis: 'تشکل‌های دانش‌آموزی و گفتمان‌ها', scope: 'همگانی', coefficient: 1, startDate: '1403/07/20', deadline: '1403/08/20', isActive: true },
+        { id: 'prg_3', code: 'PRG-03', title: 'جشنواره فرهنگی هنری امید فردا', axis: 'فرهنگی و هنری', scope: 'همگانی', coefficient: 2, startDate: '1403/08/01', deadline: '1403/10/30', isActive: true },
+        { id: 'prg_4', code: 'PRG-04', title: 'طرح ملی نماد (مراقبت در برابر آسیب‌های اجتماعی)', axis: 'مشاوره و مراقبت در برابر آسیب‌های اجتماعی', scope: 'همگانی', coefficient: 2, startDate: '1403/07/10', deadline: '1403/11/15', isActive: true },
+        { id: 'prg_5', code: 'PRG-05', title: 'برگزاری نماز جماعت منظم و اقامه در مدارس', axis: 'قرآن، عترت و نماز', scope: 'همگانی', coefficient: 3, startDate: '1403/07/01', deadline: '1403/12/28', isActive: true }
+      ],
+      employees: [
+        { id: 'emp_1', code: '01', personnelCode: '98112233', fullName: 'محمد رضایی', schoolId: 'sch_1', schoolName: 'دبیرستان شهید مطهری', grade: 'متوسطه اول', role: 'معاون پرورشی', phone: '09131111111' },
+        { id: 'emp_2', code: '02', personnelCode: '98223344', fullName: 'فاطمه حسینی', schoolId: 'sch_2', schoolName: 'دبیرستان فرزانگان ۲', grade: 'متوسطه دوم نظری', role: 'آموزگار', phone: '09132222222' },
+        { id: 'emp_3', code: '03', personnelCode: '98334455', fullName: 'علیرضا کریمی', schoolId: 'sch_3', schoolName: 'هنرستان شهدای هسته‌ای', grade: 'هنرستان فنی و حرفه‌ای و کاردانش', role: 'مدیر', phone: '09133333333' },
+        { id: 'emp_4', code: '04', personnelCode: '98445566', fullName: 'زهرا موسوی', schoolId: 'sch_4', schoolName: 'دبستان شهدای مکه', grade: 'ابتدایی دوره دوم', role: 'دبیر', phone: '09134444444' },
+        { id: 'emp_5', code: '27', personnelCode: '98556677', fullName: 'سعید احمدی', schoolId: 'sch_1', schoolName: 'دبیرستان شهید مطهری', grade: 'متوسطه اول', role: 'معاون آموزشی', phone: '09135555555' }
+      ],
+      employeePrograms: [
+        { id: 'ep_1', employeeId: 'emp_1', employeeCode: '01', programId: 'prg_1', status: 'done', actualDate: '1403/09/10', notes: 'اجرا با مشارکت ۱۲۰ دانش‌آموز' },
+        { id: 'ep_2', employeeId: 'emp_1', employeeCode: '01', programId: 'prg_2', status: 'done', actualDate: '1403/08/18', notes: 'انتخابات الکترونیکی برگزار شد' },
+        { id: 'ep_3', employeeId: 'emp_1', employeeCode: '01', programId: 'prg_3', status: 'late', actualDate: '1403/11/05', notes: 'ارسال با ۵ روز تاخیر' },
+        { id: 'ep_4', employeeId: 'emp_1', employeeCode: '01', programId: 'prg_4', status: 'not_done', notes: 'در انتظار تشکیل پرونده' },
+        { id: 'ep_5', employeeId: 'emp_2', employeeCode: '02', programId: 'prg_1', status: 'done', actualDate: '1403/09/12' },
+        { id: 'ep_6', employeeId: 'emp_2', employeeCode: '02', programId: 'prg_2', status: 'done', actualDate: '1403/08/19' },
+        { id: 'ep_7', employeeId: 'emp_2', employeeCode: '02', programId: 'prg_3', status: 'done', actualDate: '1403/10/25' },
+        { id: 'ep_8', employeeId: 'emp_3', employeeCode: '03', programId: 'prg_1', status: 'late', actualDate: '1403/09/25' },
+        { id: 'ep_9', employeeId: 'emp_3', employeeCode: '03', programId: 'prg_2', status: 'done', actualDate: '1403/08/15' },
+        { id: 'ep_10', employeeId: 'emp_5', employeeCode: '27', programId: 'prg_1', status: 'done', actualDate: '1403/09/01' }
+      ]
+    };
+    /* __STANDALONE_DATABASE_END__ */
+
+    const STORAGE_KEY = 'parvareshi_app_db_v1';
+
+    const SafeStorage = {
+      _memory: {},
+      getItem: function(key) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            return window.localStorage.getItem(key);
+          }
+        } catch (e) {}
+        return this._memory[key] || null;
+      },
+      setItem: function(key, value) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.setItem(key, value);
+            return;
+          }
+        } catch (e) {}
+        this._memory[key] = String(value);
+      }
+    };
+
+    let db = loadDB();
+    let currentCartableEmpId = (db && db.employees && db.employees[0]) ? db.employees[0].id : null;
+
+    function loadDB() {
+      try {
+        const raw = SafeStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (DEFAULT_DATABASE && DEFAULT_DATABASE._isExportedLiveDb) {
+            if (!parsed || !parsed._exportTimestamp || parsed._exportTimestamp < DEFAULT_DATABASE._exportTimestamp) {
+              SafeStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATABASE));
+              return JSON.parse(JSON.stringify(DEFAULT_DATABASE));
+            }
+          }
+          if (parsed && Array.isArray(parsed.employees) && Array.isArray(parsed.employeePrograms)) {
+            return parsed;
+          }
+        }
+      } catch (e) {}
+      SafeStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATABASE));
+      return JSON.parse(JSON.stringify(DEFAULT_DATABASE));
+    }
+
+    function saveDB(newDb) {
+      db = newDb;
+      SafeStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    }
+
+    function toPersianDigits(num) {
+      if (num === null || num === undefined) return '';
+      return String(num).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
+    function padZero(code) {
+      const c = String(code || '').trim();
+      if (!c) return '';
+      return c.length === 1 ? '0' + c : c;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-emerald-500', 'text-white');
+        btn.classList.add('text-slate-300');
+      });
+
+      const activeView = document.getElementById('view-' + tabId);
+      if (activeView) activeView.classList.remove('hidden');
+
+      const activeBtn = document.getElementById('tabBtn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-emerald-500', 'text-white');
+        activeBtn.classList.remove('text-slate-300');
+      }
+
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'cartable') renderCartable();
+      if (tabId === 'employees') renderEmployeesList();
+      if (tabId === 'programs') renderProgramsList();
+      if (tabId === 'excel_import') renderExcelImportTab();
+      if (tabId === 'ranking') renderColleagueRanking();
+      if (tabId === 'performance_report') renderPerformanceReportTable();
+      if (tabId === 'schools_report') renderSchoolsReportTable();
+      if (tabId === 'programs_report') renderProgramsReportTable();
+
+      try {
+        if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {}
+    }
+
+    function jumpToEmployeeByCode(code) {
+      const clean = padZero(code);
+      const found = db.employees.find(e => e.code === clean);
+      if (found) {
+        currentCartableEmpId = found.id;
+        switchTab('cartable');
+        return true;
+      }
+      return false;
+    }
+
+    function handleNavQuickJump(e) {
+      e.preventDefault();
+      const input = document.getElementById('navQuickCodeInput');
+      const val = input.value.trim();
+      if (!val) return;
+      if (!jumpToEmployeeByCode(val)) {
+        alert('همکاری با کد «' + padZero(val) + '» پیدا نشد.');
+      } else {
+        input.value = '';
+      }
+    }
+
+    function handleHeroQuickJump(e) {
+      e.preventDefault();
+      const input = document.getElementById('heroQuickCodeInput');
+      const errEl = document.getElementById('heroErrorMsg');
+      const val = input.value.trim();
+      errEl.classList.add('hidden');
+      if (!val) return;
+      if (!jumpToEmployeeByCode(val)) {
+        errEl.textContent = 'همکاری با کد «' + padZero(val) + '» پیدا نشد.';
+        errEl.classList.remove('hidden');
+      } else {
+        input.value = '';
+      }
+    }
+
+    // Weighted stats factoring in program coefficients 1 to 3
+    function calcEmployeeStats(empId) {
+      const prgMap = new Map(db.programs.map(p => [p.id, p]));
+      const allAssignments = db.employeePrograms.filter(ep => ep.employeeId === empId);
+      const general = allAssignments.filter(ep => {
+        const p = prgMap.get(ep.programId);
+        return !p || p.scope !== 'اختصاصی';
+      });
+
+      const total = general.length;
+      const done = general.filter(a => a.status === 'done').length;
+      const late = general.filter(a => a.status === 'late').length;
+      const notDone = general.filter(a => a.status === 'not_done').length;
+      const progressPercent = total > 0 ? Math.round(((done + late) / total) * 100) : 0;
+      const onTimePercent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      let totalCoefficients = 0;
+      let totalWeightedPossible = 0;
+      let earnedWeightedScore = 0;
+
+      general.forEach(a => {
+        const p = prgMap.get(a.programId);
+        const coeff = (p && [1, 2, 3].includes(Number(p.coefficient))) ? Number(p.coefficient) : 1;
+        totalCoefficients += coeff;
+        totalWeightedPossible += coeff * 100;
+        if (a.status === 'done') earnedWeightedScore += coeff * 100;
+        else if (a.status === 'late') earnedWeightedScore += coeff * 60;
+      });
+
+      return {
+        total,
+        done,
+        late,
+        notDone,
+        progressPercent,
+        onTimePercent,
+        totalCoefficients,
+        totalWeightedPossible,
+        earnedWeightedScore,
+      };
+    }
+
+    function calcOverallStats() {
+      const totalAssignments = db.employeePrograms.length;
+      const done = db.employeePrograms.filter(a => a.status === 'done').length;
+      const late = db.employeePrograms.filter(a => a.status === 'late').length;
+      const notDone = db.employeePrograms.filter(a => a.status === 'not_done').length;
+      const progressPercent = totalAssignments > 0 ? Math.round(((done + late) / totalAssignments) * 100) : 0;
+      const onTimePercent = totalAssignments > 0 ? Math.round((done / totalAssignments) * 100) : 0;
+      return { totalEmployees: db.employees.length, totalPrograms: db.programs.length, totalAssignments, done, late, notDone, progressPercent, onTimePercent };
+    }
+
+    function createSvgDonut(done, late, notDone, size = 180, centerSubtitle = 'تکلیف') {
+      const total = done + late + notDone;
+      if (total === 0) return '<div class="text-xs text-slate-400 py-6">بدون برنامه محوله</div>';
+      const radius = 60, stroke = 18, circumference = 2 * Math.PI * radius;
+      const doneDash = (done / total) * circumference;
+      const lateDash = (late / total) * circumference;
+      const notDoneDash = (notDone / total) * circumference;
+      const pDone = Math.round((done / total) * 100);
+      const pLate = Math.round((late / total) * 100);
+      const pNotDone = Math.round((notDone / total) * 100);
+
+      return `
+        <div class="flex flex-col items-center">
+          <svg width="${size}" height="${size}" viewBox="0 0 160 160" class="transform -rotate-90">
+            <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#f1f5f9" stroke-width="${stroke}" />
+            <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#10b981" stroke-width="${stroke}" stroke-dasharray="${doneDash} ${circumference}" stroke-dashoffset="0" />
+            <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#f59e0b" stroke-width="${stroke}" stroke-dasharray="${lateDash} ${circumference}" stroke-dashoffset="${-doneDash}" />
+            <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#ef4444" stroke-width="${stroke}" stroke-dasharray="${notDoneDash} ${circumference}" stroke-dashoffset="${-(doneDash + lateDash)}" />
+          </svg>
+          <div class="mt-3 flex items-center justify-center gap-3 text-[11px] font-bold">
+            <span class="text-emerald-700">🟢 ${toPersianDigits(pDone)}٪ به‌موقع</span>
+            <span class="text-amber-700">🟠 ${toPersianDigits(pLate)}٪ با تاخیر</span>
+            <span class="text-rose-700">🔴 ${toPersianDigits(pNotDone)}٪ عدم اجرا</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDashboard() {
+      const overall = calcOverallStats();
+      const kpis = [
+        { label: 'کل همکاران', val: overall.totalEmployees, color: 'text-slate-800' },
+        { label: 'کل طرح‌ها', val: overall.totalPrograms, color: 'text-slate-800' },
+        { label: 'کل تکالیف', val: overall.totalAssignments, color: 'text-slate-800' },
+        { label: '🟢 انجام شده', val: overall.done, color: 'text-emerald-600', bg: 'bg-emerald-50/40' },
+        { label: '🟠 دیر انجام شده', val: overall.late, color: 'text-amber-600', bg: 'bg-amber-50/40' },
+        { label: '🔴 انجام نشده', val: overall.notDone, color: 'text-rose-600', bg: 'bg-rose-50/40' },
+        { label: '📊 درصد پیشرفت', val: overall.progressPercent + '٪', color: 'text-emerald-700', bg: 'bg-emerald-50/60' },
+        { label: '⏱️ اجرای به‌موقع', val: overall.onTimePercent + '٪', color: 'text-blue-700', bg: 'bg-blue-50/60' }
+      ];
+
+      document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs ${k.bg || ''}">
+          <div class="text-[10px] font-bold text-slate-500 mb-1">${k.label}</div>
+          <div class="text-2xl font-black ${k.color}">${toPersianDigits(k.val)}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('overallDonutChart').innerHTML = createSvgDonut(overall.done, overall.late, overall.notDone, 170, 'تکلیف');
+
+      const chipsHtml = db.employees.slice(0, 6).map(e => `
+        <button onclick="jumpToEmployeeByCode('${e.code}')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-mono font-bold">
+          <span class="text-emerald-400">${e.code}</span> (${e.fullName.split(' ')[0]})
+        </button>
+      `).join('');
+      document.getElementById('quickChipsContainer').innerHTML = '<span class="text-[11px] text-slate-400 ml-1">کدهای سریع:</span>' + chipsHtml;
+
+      const ranked = [...db.employees].map(e => ({ emp: e, stats: calcEmployeeStats(e.id) }))
+        .sort((a,b) => b.stats.earnedWeightedScore - a.stats.earnedWeightedScore || b.stats.progressPercent - a.stats.progressPercent)
+        .slice(0, 5);
+
+      document.getElementById('topRankedList').innerHTML = ranked.map(({ emp, stats }, idx) => `
+        <div onclick="jumpToEmployeeByCode('${emp.code}')" class="py-3 flex items-center justify-between hover:bg-slate-50 px-2 rounded-xl transition-colors cursor-pointer">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-700">${toPersianDigits(idx + 1)}</span>
+            <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded-md">${emp.code}</span>
+            <div>
+              <div class="font-bold text-sm text-slate-800">${emp.fullName}</div>
+              <div class="text-xs text-slate-500">${emp.schoolName}</div>
+            </div>
+          </div>
+          <div class="text-left font-mono font-bold text-amber-800 text-sm">
+            ${toPersianDigits(stats.earnedWeightedScore)} امتیاز با ضریب
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCartable() {
+      const emp = db.employees.find(e => e.id === currentCartableEmpId) || db.employees[0];
+      if (!emp) return;
+      currentCartableEmpId = emp.id;
+
+      const stats = calcEmployeeStats(emp.id);
+      const prgMap = new Map(db.programs.map(p => [p.id, p]));
+      const assignments = db.employeePrograms.filter(ep => ep.employeeId === emp.id);
+
+      document.getElementById('cartableProfileCard').innerHTML = `
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex flex-col items-center justify-center shadow-lg border-2 border-emerald-300/40">
+              <span class="text-3xl font-black font-mono">${emp.code}</span>
+              <span class="text-[9px] uppercase tracking-wider text-emerald-100">کد همکار</span>
+            </div>
+            <div>
+              <h2 class="text-2xl font-black">${emp.fullName}</h2>
+              <div class="flex flex-wrap items-center gap-3 text-xs text-slate-300 mt-1">
+                <span>🏫 ${emp.schoolName}</span>
+                <span>🎓 ${emp.grade}</span>
+                <span>💼 ${emp.role}</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white/10 p-3.5 rounded-2xl border border-white/10 flex flex-col gap-1 text-xs">
+            <div>امتیاز با ضریب: <strong class="font-mono text-amber-400 text-base">${toPersianDigits(stats.earnedWeightedScore)}</strong></div>
+            <div>درصد پیشرفت: <strong class="font-mono text-emerald-400 text-sm">${toPersianDigits(stats.progressPercent)}٪</strong></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('cartableKpiGrid').innerHTML = `
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <div class="text-xs text-slate-500 font-bold mb-1">کل برنامه‌ها</div>
+          <div class="text-3xl font-black text-slate-800">${toPersianDigits(stats.total)}</div>
+        </div>
+        <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-200">
+          <div class="text-xs text-emerald-800 font-bold mb-1">🟢 انجام شده</div>
+          <div class="text-3xl font-black text-emerald-700">${toPersianDigits(stats.done)}</div>
+        </div>
+        <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-200">
+          <div class="text-xs text-amber-800 font-bold mb-1">🟠 دیر انجام شده</div>
+          <div class="text-3xl font-black text-amber-700">${toPersianDigits(stats.late)}</div>
+        </div>
+        <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
+          <div class="text-xs text-rose-800 font-bold mb-1">🔴 انجام نشده</div>
+          <div class="text-3xl font-black text-rose-700">${toPersianDigits(stats.notDone)}</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 sm:col-span-2 flex flex-col justify-between">
+          <div class="text-xs text-slate-700 font-bold">مجموع امتیاز مکتسبه با ضرایب ۱ تا ۳</div>
+          <div class="text-2xl font-black text-amber-700 font-mono">${toPersianDigits(stats.earnedWeightedScore)} امتیاز</div>
+        </div>
+      `;
+
+      document.getElementById('cartableDonutChart').innerHTML = createSvgDonut(stats.done, stats.late, stats.notDone, 160, 'برنامه');
+
+      document.getElementById('cartableProgramsTableBody').innerHTML = assignments.map((a, idx) => {
+        const prg = prgMap.get(a.programId);
+        if (!prg) return '';
+        const coeff = (prg && [1, 2, 3].includes(Number(prg.coefficient))) ? Number(prg.coefficient) : 1;
+        let badge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">🔴 انجام نشده</span>';
+        if (a.status === 'done') badge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">🟢 انجام شده</span>';
+        if (a.status === 'late') badge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">🟠 دیر انجام شده</span>';
+
+        const pts = prg.scope === 'اختصاصی' ? 0 : (a.status === 'done' ? coeff * 100 : (a.status === 'late' ? coeff * 60 : 0));
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-3 text-center text-slate-400 font-bold">${toPersianDigits(idx + 1)}</td>
+            <td class="p-3">
+              <div class="font-bold text-slate-800">${prg.title}</div>
+              <div class="text-[10px] font-mono text-slate-400">${prg.code}</div>
+            </td>
+            <td class="p-3 text-center font-bold text-amber-900 bg-amber-50">ضریب ${toPersianDigits(coeff)}</td>
+            <td class="p-3 text-slate-600">${prg.axis}</td>
+            <td class="p-3 text-center font-mono">${prg.deadline}</td>
+            <td class="p-3 text-center font-mono font-bold">${a.actualDate || '---'}</td>
+            <td class="p-3 text-center">${a.submissionPlatform || 'ایتا'}</td>
+            <td class="p-3 text-center">${badge}</td>
+            <td class="p-3 text-center font-mono font-bold text-emerald-700">${pts > 0 ? '+' + toPersianDigits(pts) : '۰'}</td>
+            <td class="p-3 text-slate-600 text-xs">${a.notes || '---'}</td>
+            <td class="p-3 text-center no-print">
+              <div class="inline-flex items-center gap-1">
+                <button title="انجام شده" onclick="quickSetStatus('${a.id}', 'done')" class="p-1 rounded bg-slate-100 hover:bg-emerald-100 text-xs cursor-pointer">🟢</button>
+                <button title="دیر انجام شده" onclick="quickSetStatus('${a.id}', 'late')" class="p-1 rounded bg-slate-100 hover:bg-amber-100 text-xs cursor-pointer">🟠</button>
+                <button title="انجام نشده" onclick="quickSetStatus('${a.id}', 'not_done')" class="p-1 rounded bg-slate-100 hover:bg-rose-100 text-xs cursor-pointer">🔴</button>
+                <button title="ویرایش کامل" onclick="openStatusEditorModal('${a.id}')" class="p-1 rounded bg-slate-100 hover:bg-blue-100 text-xs cursor-pointer">✏️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function quickSetStatus(assignmentId, newStatus) {
+      const idx = db.employeePrograms.findIndex(a => a.id === assignmentId);
+      if (idx !== -1) {
+        db.employeePrograms[idx].status = newStatus;
+        if (newStatus === 'done' && !db.employeePrograms[idx].actualDate) {
+          db.employeePrograms[idx].actualDate = '1403/09/15';
+        }
+        saveDB(db);
+        renderCartable();
+      }
+    }
+
+    function navigateCartablePrev() {
+      const idx = db.employees.findIndex(e => e.id === currentCartableEmpId);
+      if (idx > 0) {
+        currentCartableEmpId = db.employees[idx - 1].id;
+        renderCartable();
+      }
+    }
+
+    function navigateCartableNext() {
+      const idx = db.employees.findIndex(e => e.id === currentCartableEmpId);
+      if (idx < db.employees.length - 1) {
+        currentCartableEmpId = db.employees[idx + 1].id;
+        renderCartable();
+      }
+    }
+
+    function renderEmployeesList() {
+      const query = (document.getElementById('searchEmployeesInput').value || '').trim().toLowerCase();
+      const roleFilter = document.getElementById('filterEmployeesRole')?.value || 'all';
+
+      const filtered = db.employees.filter(e => {
+        if (roleFilter !== 'all' && e.role !== roleFilter) return false;
+        if (!query) return true;
+        return e.code.includes(query) || (e.personnelCode && e.personnelCode.includes(query)) || e.fullName.toLowerCase().includes(query) || e.schoolName.toLowerCase().includes(query);
+      });
+
+      document.getElementById('employeesCountBadge').textContent = `تعداد: ${toPersianDigits(filtered.length)} نفر`;
+
+      document.getElementById('employeesCardsGrid').innerHTML = filtered.map(emp => `
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2.5 py-1 rounded-lg">کد: ${emp.code}</span>
+              <div class="flex items-center gap-1 text-xs">
+                <button onclick="openEmployeeModal('${emp.id}')" class="text-blue-600 hover:underline cursor-pointer">ویرایش</button>
+                <button onclick="deleteEmployee('${emp.id}')" class="text-rose-600 hover:underline mr-2 cursor-pointer">حذف</button>
+              </div>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">${emp.fullName}</h3>
+            <p class="text-xs text-slate-500 mt-1">${emp.schoolName} | ${emp.role}</p>
+          </div>
+          <button onclick="jumpToEmployeeByCode('${emp.code}')" class="mt-4 w-full py-2 bg-slate-50 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+            ورود به کارتابل همکار ↵
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderProgramsList() {
+      document.getElementById('programsCardsGrid').innerHTML = db.programs.map(prg => {
+        const coeff = prg.coefficient || 1;
+        return `
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold bg-slate-100 px-2 py-0.5 rounded">${prg.code}</span>
+                  <span class="text-xs font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">ضریب ${toPersianDigits(coeff)}</span>
+                </div>
+                <span class="text-xs text-slate-500 font-mono">مهلت: ${prg.deadline}</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-800">${prg.title}</h3>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] rounded">${prg.axis}</span>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <button onclick="openAssignModal(null, '${prg.id}')" class="text-teal-700 font-bold hover:underline cursor-pointer">➕ اختصاص به همکاران</button>
+              <div class="flex gap-2">
+                <button onclick="openProgramModal('${prg.id}')" class="text-blue-600 hover:underline cursor-pointer">ویرایش</button>
+                <button onclick="deleteProgram('${prg.id}')" class="text-rose-600 hover:underline cursor-pointer">حذف</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPerformanceReportTable() {
+      const q = (document.getElementById('searchReportInput')?.value || '').trim().toLowerCase();
+      const rows = db.employees.filter(e => {
+        if (!q) return true;
+        return e.code.includes(q) || e.fullName.toLowerCase().includes(q) || e.schoolName.toLowerCase().includes(q);
+      }).map(emp => ({ emp, stats: calcEmployeeStats(emp.id) }));
+
+      document.getElementById('performanceReportTableBody').innerHTML = rows.map(({ emp, stats }, idx) => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="p-3 text-center text-slate-400 font-bold">${toPersianDigits(idx + 1)}</td>
+          <td class="p-3 text-center">
+            <button onclick="jumpToEmployeeByCode('${emp.code}')" class="font-mono font-bold px-2 py-0.5 bg-slate-900 text-white rounded text-xs hover:bg-emerald-600 cursor-pointer">
+              ${emp.code}
+            </button>
+          </td>
+          <td class="p-3 font-bold text-slate-800">${emp.fullName}</td>
+          <td class="p-3 text-slate-600">${emp.schoolName}</td>
+          <td class="p-3 text-slate-600">${emp.role} (${emp.grade})</td>
+          <td class="p-3 text-center font-bold">${toPersianDigits(stats.total)}</td>
+          <td class="p-3 text-center font-bold text-emerald-600 bg-emerald-50/20">${toPersianDigits(stats.done)}</td>
+          <td class="p-3 text-center font-bold text-amber-600 bg-amber-50/20">${toPersianDigits(stats.late)}</td>
+          <td class="p-3 text-center font-bold text-rose-600 bg-rose-50/20">${toPersianDigits(stats.notDone)}</td>
+          <td class="p-3 text-center font-black text-emerald-700 bg-emerald-50/50 font-mono">${toPersianDigits(stats.progressPercent)}٪</td>
+          <td class="p-3 text-center font-black text-amber-900 bg-amber-50/50 font-mono">${toPersianDigits(stats.earnedWeightedScore)}</td>
+          <td class="p-3 text-center no-print">
+            <button onclick="jumpToEmployeeByCode('${emp.code}')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-100 text-xs font-bold rounded cursor-pointer">کارتابل</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSchoolsReportTable() {
+      const prgMap = new Map(db.programs.map(p => [p.id, p]));
+      document.getElementById('schoolsReportTableBody').innerHTML = db.schools.map((s, idx) => {
+        const staff = db.employees.filter(e => e.schoolName === s.name || e.schoolId === s.id);
+        const staffIds = new Set(staff.map(e => e.id));
+        const assignments = db.employeePrograms.filter(ep => staffIds.has(ep.employeeId));
+        const total = assignments.length;
+        const done = assignments.filter(a => a.status === 'done').length;
+        const late = assignments.filter(a => a.status === 'late').length;
+        const notDone = assignments.filter(a => a.status === 'not_done').length;
+        const progress = total > 0 ? Math.round(((done + late) / total) * 100) : 0;
+
+        let earnedScore = 0;
+        assignments.forEach(a => {
+          const p = prgMap.get(a.programId);
+          const coeff = (p && [1, 2, 3].includes(Number(p.coefficient))) ? Number(p.coefficient) : 1;
+          if (a.status === 'done') earnedScore += coeff * 100;
+          else if (a.status === 'late') earnedScore += coeff * 60;
+        });
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-3 text-center text-slate-400 font-bold">${toPersianDigits(idx + 1)}</td>
+            <td class="p-3 font-bold text-slate-800">${s.name}</td>
+            <td class="p-3 text-center font-mono text-slate-500">${toPersianDigits(s.code || '---')}</td>
+            <td class="p-3 text-slate-600">${s.grade} (${s.gender})</td>
+            <td class="p-3 text-center font-bold">${toPersianDigits(staff.length)} نفر</td>
+            <td class="p-3 text-center font-bold">${toPersianDigits(total)}</td>
+            <td class="p-3 text-center font-bold text-emerald-600">${toPersianDigits(done)}</td>
+            <td class="p-3 text-center font-bold text-amber-600">${toPersianDigits(late)}</td>
+            <td class="p-3 text-center font-bold text-rose-600">${toPersianDigits(notDone)}</td>
+            <td class="p-3 text-center font-black text-emerald-700 font-mono">${toPersianDigits(progress)}٪</td>
+            <td class="p-3 text-center font-black text-amber-900 bg-amber-50 font-mono">${toPersianDigits(earnedScore)}</td>
+            <td class="p-3 text-center no-print">
+              <button onclick="openSchoolModal('${s.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-bold cursor-pointer">ویرایش</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderProgramsReportTable() {
+      const tbody = document.getElementById('programsReportTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = db.programs.map((p, idx) => {
+        const assignments = db.employeePrograms.filter(ep => ep.programId === p.id);
+        const total = assignments.length;
+        const done = assignments.filter(a => a.status === 'done').length;
+        const late = assignments.filter(a => a.status === 'late').length;
+        const notDone = assignments.filter(a => a.status === 'not_done').length;
+        const progress = total > 0 ? Math.round(((done + late) / total) * 100) : 0;
+        const coeff = p.coefficient || 1;
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-3 text-center text-slate-400 font-bold">${toPersianDigits(idx + 1)}</td>
+            <td class="p-3 text-center font-mono font-bold text-slate-700">${p.code}</td>
+            <td class="p-3 font-bold text-slate-800">${p.title}</td>
+            <td class="p-3 text-center font-bold text-amber-900 bg-amber-50">ضریب ${toPersianDigits(coeff)}</td>
+            <td class="p-3 text-slate-600">${p.axis}</td>
+            <td class="p-3 text-center font-mono text-slate-500">${toPersianDigits(p.deadline)}</td>
+            <td class="p-3 text-center font-bold">${toPersianDigits(total)} نفر</td>
+            <td class="p-3 text-center font-bold text-emerald-600">${toPersianDigits(done)}</td>
+            <td class="p-3 text-center font-bold text-amber-600">${toPersianDigits(late)}</td>
+            <td class="p-3 text-center font-bold text-rose-600">${toPersianDigits(notDone)}</td>
+            <td class="p-3 text-center font-black text-emerald-700 font-mono">${toPersianDigits(progress)}٪</td>
+            <td class="p-3 text-center no-print">
+              <button onclick="openAssignModal(null, '${p.id}')" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded text-[11px] font-bold cursor-pointer">➕ تخصیص</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderColleagueRanking() {
+      const query = (document.getElementById('searchRankingInput')?.value || '').trim().toLowerCase();
+      let ranked = db.employees.map(emp => {
+        const stats = calcEmployeeStats(emp.id);
+        const score = stats.earnedWeightedScore;
+        let tier = 'نیازمند پیگیری';
+        if (score >= 600 || stats.progressPercent >= 85) tier = 'ممتاز (پیشگام)';
+        else if (score >= 350 || stats.progressPercent >= 65) tier = 'بسیار خوب';
+        else if (score >= 150 || stats.progressPercent >= 40) tier = 'خوب';
+
+        return { emp, stats, score, tier };
+      });
+
+      if (query) {
+        ranked = ranked.filter(({ emp }) => emp.fullName.toLowerCase().includes(query) || emp.code.includes(query) || emp.schoolName.toLowerCase().includes(query));
+      }
+
+      ranked.sort((a, b) => b.score - a.score || b.stats.progressPercent - a.stats.progressPercent);
+
+      const podiumEl = document.getElementById('rankingPodiumContainer');
+      if (podiumEl && ranked.length >= 3) {
+        podiumEl.innerHTML = `
+          <div class="bg-slate-100 p-5 rounded-2xl border text-center">
+            <div class="text-3xl mb-1">🥈</div>
+            <div class="text-xs text-slate-500 font-bold">رتبه دوم</div>
+            <div class="font-bold text-base text-slate-800">${ranked[1].emp.fullName}</div>
+            <div class="text-xs text-slate-500">${ranked[1].emp.schoolName}</div>
+            <div class="text-lg font-black text-amber-800 mt-2 font-mono">${toPersianDigits(ranked[1].score)} امتیاز با ضریب</div>
+          </div>
+          <div class="bg-amber-100/70 p-6 rounded-2xl border-2 border-amber-400 text-center shadow-md">
+            <div class="text-4xl mb-1">🥇</div>
+            <div class="text-xs text-amber-900 font-black">رتبه اول</div>
+            <div class="font-black text-lg text-amber-950">${ranked[0].emp.fullName}</div>
+            <div class="text-xs text-amber-800">${ranked[0].emp.schoolName}</div>
+            <div class="text-2xl font-black text-amber-900 mt-2 font-mono">${toPersianDigits(ranked[0].score)} امتیاز با ضریب</div>
+          </div>
+          <div class="bg-orange-50 p-5 rounded-2xl border text-center">
+            <div class="text-3xl mb-1">🥉</div>
+            <div class="text-xs text-orange-700 font-bold">رتبه سوم</div>
+            <div class="font-bold text-base text-slate-800">${ranked[2].emp.fullName}</div>
+            <div class="text-xs text-slate-500">${ranked[2].emp.schoolName}</div>
+            <div class="text-lg font-black text-amber-800 mt-2 font-mono">${toPersianDigits(ranked[2].score)} امتیاز با ضریب</div>
+          </div>
+        `;
+      }
+
+      const tbody = document.getElementById('rankingTableBody');
+      if (tbody) {
+        tbody.innerHTML = ranked.map(({ emp, stats, score, tier }, idx) => `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-3 text-center font-bold">${toPersianDigits(idx + 1)}</td>
+            <td class="p-3 text-center">
+              <button onclick="jumpToEmployeeByCode('${emp.code}')" class="font-mono font-bold px-2 py-0.5 bg-slate-900 text-white rounded text-xs hover:bg-emerald-600 cursor-pointer">
+                ${emp.code}
+              </button>
+            </td>
+            <td class="p-3 font-bold text-slate-900">${emp.fullName}</td>
+            <td class="p-3 text-slate-700">${emp.schoolName}</td>
+            <td class="p-3 text-slate-500">${emp.role}</td>
+            <td class="p-3 text-center font-bold">${toPersianDigits(stats.total)}</td>
+            <td class="p-3 text-center font-bold text-amber-800 bg-amber-50">${toPersianDigits(stats.totalCoefficients)}</td>
+            <td class="p-3 text-center font-bold text-emerald-600">${toPersianDigits(stats.done)}</td>
+            <td class="p-3 text-center font-bold text-amber-600">${toPersianDigits(stats.late)}</td>
+            <td class="p-3 text-center font-bold text-rose-600">${toPersianDigits(stats.notDone)}</td>
+            <td class="p-3 text-center font-bold text-emerald-700">${toPersianDigits(stats.progressPercent)}٪</td>
+            <td class="p-3 text-center font-black text-amber-900 bg-amber-50 font-mono text-sm">${toPersianDigits(score)}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${tier}</span></td>
+            <td class="p-3 text-center no-print">
+              <button onclick="jumpToEmployeeByCode('${emp.code}')" class="px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold cursor-pointer">کارتابل ↵</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function initApp() {
+      try { switchTab('dashboard'); } catch (e) {}
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>

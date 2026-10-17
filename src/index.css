@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* 1. Nastaliq Font (نستعلیق) */
+@font-face {
+  font-family: 'IranNastaliq';
+  src: local('IranNastaliq'), local('Iran Nastaliq'), local('Nastaliq'),
+       url('https://cdn.jsdelivr.net/gh/font-store/font-IranNastaliq@master/WebFonts/IranNastaliq-Web.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/font-store/font-IranNastaliq@master/WebFonts/IranNastaliq-Web.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2. Titr Font (تیتر) */
+@font-face {
+  font-family: 'BTitr';
+  src: local('B Titr'), local('BTitr'), local('Titr'), local('IRANTitr'), local('Far.Titr');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 3. Mitra Font (میترا) */
+@font-face {
+  font-family: 'BMitra';
+  src: local('B Mitra'), local('BMitra'), local('Mitra'), local('IRANMitra'), local('Far.Mitra');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 4. Vazir Font (وزیری) */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: local('Vazirmatn'), local('Vazir');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  body {
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+/* Dedicated Persian Typography Classes */
+.font-nastaliq {
+  font-family: 'IranNastaliq', 'Noto Nastaliq Urdu', 'Nastaliq', 'Vazirmatn', cursive !important;
+  line-height: 2 !important;
+}
+
+.font-titr {
+  font-family: 'BTitr', 'B Titr', 'Titr', 'Vazirmatn', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+}
+
+.font-mitra {
+  font-family: 'BMitra', 'B Mitra', 'Mitra', 'Vazirmatn', serif !important;
+}
+
+.font-vazir {
+  font-family: 'Vazirmatn', 'Vazir', system-ui, sans-serif !important;
+}
+
+/* Global Font Switcher Themes */
+body.font-theme-vazir,
+.font-theme-vazir {
+  font-family: 'Vazirmatn', 'Vazir', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body.font-theme-mitra,
+.font-theme-mitra {
+  font-family: 'BMitra', 'B Mitra', 'Mitra', 'Vazirmatn', serif;
+}
+
+body.font-theme-titr,
+.font-theme-titr {
+  font-family: 'BTitr', 'B Titr', 'Titr', 'Vazirmatn', sans-serif;
+}
+
+body.font-theme-nastaliq,
+.font-theme-nastaliq {
+  font-family: 'IranNastaliq', 'Noto Nastaliq Urdu', 'Nastaliq', 'Vazirmatn', cursive;
+  line-height: 1.85;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+  .shadow-xs, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+    box-shadow: none !important;
+  }
+  .border {
+    border-color: #cbd5e1 !important;
+  }
+  @page {
+    margin: 1.2cm;
+    size: A4 portrait;
+  }
+}
